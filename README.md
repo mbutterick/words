@@ -1,5 +1,5 @@
 # words
-make lists of words (this is interesting mostly if you design fonts)
+generate lists of words (perhaps interesting to those who design fonts)
 
 
 ## License = MIT
