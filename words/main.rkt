@@ -15,8 +15,10 @@
                   #:max-words [max-words 10]
                   #:all-caps [all-caps? #f]
                   #:initial-caps [initial-caps? #f])
-  (define mandatory-cs (if mandatory (string->list mandatory) null))
-  (define letter-cs (append (if letters (string->list letters) null) mandatory-cs))
+  (define mandatory-cs
+    (if mandatory (remove-duplicates (map char-downcase (string->list mandatory)) char=?) null))
+  (define letter-cs (remove-duplicates (append (if letters (map char-downcase (string->list letters)) null) mandatory-cs) char=?))
+  (define letter-cs-charidx (word->charidx (list->string letter-cs)))
   (for*/fold ([ws null]
               [count 0]
               #:result (map (cond
@@ -31,13 +33,13 @@
               #:when (and
                       ;; between min and max length
                       ((if (<= min-length max-length) <= >=) min-length w-lengthidx max-length)
-                      ;; contains each mandatory, case-insensitive
+                      ;; word contains each mandatory char, case-insensitive
                       (or (not mandatory)
-                          (for/or ([c (in-list (map char-downcase (charidx->chars w-charidx)))])
-                            (memv c mandatory-cs)))
-                      ;; contains only letters + mandatory, case-insensitive
-                      (for/and ([c (in-list (map char-downcase (charidx->chars w-charidx)))])
-                        (memv c letter-cs))
+                          (for/and ([mc (in-list mandatory-cs)])
+                                   (w-charidx . contains-char? . mc)))
+                      ;; word contains only letters + mandatory, case-insensitive
+                      (for/and ([wc (in-list (map char-downcase (charidx->chars w-charidx)))])
+                               (letter-cs-charidx . contains-char? . wc))
                       ;; maybe only proper names
                       (if proper-names? (capitalized? w-charidx) (not (capitalized? w-charidx)))
                       ;; maybe hide plurals
@@ -45,4 +47,7 @@
     (values (cons w ws) (add1 count))))
 
 (module+ test
-  (time (wordlist)))
+  (require rackunit)
+  (time (wordlist))
+  (check-equal? (sort (wordlist #:mandatory "xyz") string<?)
+                '("azoxy" "dysoxidize" "isazoxy" "oxytonize" "rhizotaxy" "zootaxy")))

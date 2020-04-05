@@ -1,6 +1,7 @@
 #lang debug racket/base
 (require racket/file
          racket/fasl
+         racket/vector
          "words.rkt")
 (provide (all-defined-out))
 
@@ -28,15 +29,15 @@
              #:when (bitwise-bit-set? int i))
     (bitindex->char i)))
 
-(define charidx-file "data/charidx.rktd")
+(define charidx-file "compiled/charidx.rktd")
 
 (define (regenerate-char-index!)
-  (s-exp->fasl (map word->charidx usable-words) (open-output-file charidx-file #:exists 'replace)))
+  (s-exp->fasl (vector-map word->charidx usable-words) (open-output-file charidx-file #:exists 'replace)))
 
 (define charidx (let ()
                   (unless (file-exists? charidx-file)
                     (regenerate-char-index!))
-                  (list->vector (fasl->s-exp (open-input-file charidx-file)))))
+                  (fasl->s-exp (open-input-file charidx-file))))
 
 (define (contains-char? charidx-entry c)
   (bitwise-bit-set? charidx-entry (char->bitindex c)))

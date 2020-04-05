@@ -19,7 +19,7 @@
       w))
   ws)
 
-(define wordidx-file "data/wordidx.rktd")
+(define wordidx-file "compiled/wordidx.rktd")
 
 (define (regenerate-word-index!)
   (s-exp->fasl (make-wordlist) (open-output-file wordidx-file #:exists 'replace)))
