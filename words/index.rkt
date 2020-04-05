@@ -6,30 +6,10 @@
 
 (define-runtime-path wordidx-file "compiled/words/words-index.rktd")
 
-(struct word-rec (word charint length) #:prefab)
+(define (word-rec-word val) (vector-ref val 0))
+(define (word-rec-charint val) (vector-ref val 1))
+(define (word-rec-length val) (vector-ref val 2))
 
-(define (make-word-recs)
-  (define reverse-string (compose1 list->string reverse string->list))
-  (define omit-words (map reverse-string (file->lines "data/omit.rktd")))
-  (for/vector ([w (in-lines (open-input-file "data/words.rktd"))]
-               #:when (and (not (regexp-match "'" w)) ; no apostrophes
-                           (regexp-match #rx"^[A-Za-z]+$" w) ; no accented letters
-                           (not (member w omit-words)))) ; no bad words
-              (word-rec w
-                        (word->charidx w)
-                        (string-length w))))
-
-(define (regenerate-word-index!)
-  (make-parent-directory* wordidx-file)
-  (s-exp->fasl
-   (make-word-recs)
-   (open-output-file wordidx-file #:exists 'replace)))
-
-(define wordrecs
-  (fasl->s-exp (open-input-file (and
-                                  (unless (file-exists? wordidx-file)
-                                    (regenerate-word-index!))
-                                  wordidx-file))))
 
 (define (char->bitindex c)
   ;; 64-bit layout
@@ -66,3 +46,27 @@
   ;; a cap only appears at the beginning of a word,
   ;; so it's sufficient to test whether a cap exists in the idx
   (positive? (bitwise-and charidx-entry capitalized-mask)))
+
+
+(define (make-word-recs)
+  (define reverse-string (compose1 list->string reverse string->list))
+  (define omit-words (map reverse-string (file->lines "data/omit.rktd")))
+  (for/vector ([w (in-lines (open-input-file "data/words.rktd"))]
+               #:when (and (not (regexp-match "'" w)) ; no apostrophes
+                           (regexp-match #rx"^[A-Za-z]+$" w) ; no accented letters
+                           (not (member w omit-words)))) ; no bad words
+              (vector w
+                      (word->charidx w)
+                      (string-length w))))
+
+(define (regenerate-word-index!)
+  (make-parent-directory* wordidx-file)
+  (s-exp->fasl
+   (make-word-recs)
+   (open-output-file wordidx-file #:exists 'replace)))
+
+(define wordrecs
+  (fasl->s-exp (open-input-file (and
+                                 (unless (file-exists? wordidx-file)
+                                   (regenerate-word-index!))
+                                 wordidx-file))))

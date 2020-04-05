@@ -37,8 +37,8 @@
               #:result word-acc)
              ([idx (in-list ((if random shuffle values) (range (vector-length wordrecs))))]
               [rec (in-value (vector-ref wordrecs idx))]
-              [w (in-value (word-rec-word rec))]
-              [w-charidx (in-value (word-rec-charint rec))]
+              [word (in-value (word-rec-word rec))]
+              [word-charidx (in-value (word-rec-charint rec))]
               #:break (= count (or max-words +inf.0))
               #:when (and
                       ;; between min and max length
@@ -46,15 +46,15 @@
                       ;; word contains each mandatory char, case-insensitive
                       (or (not mandatory)
                           (for/and ([mc (in-list mandatory-cs)])
-                                   (w-charidx . contains-char? . mc)))
+                                   (word-charidx . contains-char? . mc)))
                       ;; word contains only letters + mandatory, case-insensitive
-                      (for/and ([wc (in-list (map char-downcase (charidx->chars w-charidx)))])
+                      (for/and ([wc (in-list (map char-downcase (charidx->chars word-charidx)))])
                                (letter-cs-charidx . contains-char? . wc))
                       ;; maybe only proper names
-                      (if proper-names? (capitalized? w-charidx) (not (capitalized? w-charidx)))
+                      (if proper-names? (capitalized? word-charidx) (not (capitalized? word-charidx)))
                       ;; maybe hide plurals
-                      (if hide-plurals? (not (regexp-match #rx"s$" w)) #t)))
-    (values (cons (capitalizer w) word-acc) (add1 count))))
+                      (if hide-plurals? (not (regexp-match #rx"s$" word)) #t)))
+    (values (cons (capitalizer word) word-acc) (add1 count))))
 
 (module+ test
   (require rackunit)
