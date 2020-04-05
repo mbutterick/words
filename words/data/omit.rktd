@@ -1,0 +1,11 @@
+kcuf
+tnuc
+tihs
+yssup
+elohssa
+kcoc
+nmad
+traf
+gaf
+tihs
+reggin
