@@ -36,12 +36,21 @@
 (define charidx (let ()
                   (unless (file-exists? charidx-file)
                     (regenerate-char-index!))
-                  (fasl->s-exp (open-input-file charidx-file))))
+                  (list->vector (fasl->s-exp (open-input-file charidx-file)))))
 
 (define (contains-char? charidx-entry c)
   (bitwise-bit-set? charidx-entry (char->bitindex c)))
 
+(define capitalized-mask
+  (for/sum ([i (in-range 32 59)])
+    (expt 2 i)))
+
+(define (capitalized? charidx-entry)
+  ;; a cap only appears at the beginning of a word,
+  ;; so it's sufficient to test whether a cap exists in the idx
+  (positive? (bitwise-and charidx-entry capitalized-mask)))
+
 (module+ test
-  (require rackunit)
-  (check-equal? (length (filter (λ (ce) (contains-char? ce #\z)) charidx)) 7830)
+  (require rackunit racket/vector)
+  (check-equal? (vector-length (vector-filter (λ (ce) (contains-char? ce #\z)) charidx)) 7830)
   (check-equal? (charidx->chars (word->charidx "abuzz")) '(#\a #\b #\u #\z)))

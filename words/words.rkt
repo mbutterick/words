@@ -1,5 +1,6 @@
 #lang debug racket/base
 (require racket/file
+         racket/fasl
          racket/string)
 (provide usable-words)
 
@@ -15,7 +16,15 @@
                            (regexp-match #rx"^[A-Za-z]+$" w) ; no accented letters
                            (not (member w omit-words)) ; no bad words
                            ))
-              w))
+      w))
   ws)
 
-(define usable-words (make-wordlist))
+(define wordidx-file "data/wordidx.rktd")
+
+(define (regenerate-word-index!)
+  (s-exp->fasl (make-wordlist) (open-output-file wordidx-file #:exists 'replace)))
+
+(define usable-words (let ()
+                       (unless (file-exists? wordidx-file)
+                         (regenerate-word-index!))
+                       (list->vector (fasl->s-exp (open-input-file wordidx-file)))))
