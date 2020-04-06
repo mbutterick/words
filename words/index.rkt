@@ -22,7 +22,7 @@
 (define (word->charidx word)
   (apply bitwise-ior
          (for/list ([c (in-string word)])
-                   (expt 2 (char->bitindex c)))))
+           (expt 2 (char->bitindex c)))))
 
 (define (bitindex->char i)
   (cond
@@ -33,34 +33,29 @@
 (define (charidx->chars int)
   (for/list ([i (in-range 64)]
              #:when (bitwise-bit-set? int i))
-            (bitindex->char i)))
+    (bitindex->char i)))
 
 (define (contains-char? charidx-entry c)
   (bitwise-bit-set? charidx-entry (char->bitindex c)))
 
 (define capitalized-mask
   (for/sum ([i (in-range 32 59)])
-           (expt 2 i)))
+    (expt 2 i)))
 
 (define (capitalized? charidx-entry)
   ;; a cap only appears at the beginning of a word,
   ;; so it's sufficient to test whether a cap exists in the idx
   (positive? (bitwise-and charidx-entry capitalized-mask)))
 
+(define-runtime-path words-data "data/words.rktd")
 
 (define (make-word-recs)
-  (for/vector ([w (in-lines (open-input-file "data/words.rktd"))]
-               #:when (and (not (regexp-match "'" w)) ; no apostrophes
-                           (regexp-match #rx"^[A-Za-z]+$" w)))
-              (vector w
-                      (word->charidx w)
-                      (string-length w))))
+  (for/vector ([w (in-lines (open-input-file words-data))])
+    (vector w (word->charidx w) (string-length w))))
 
 (define (regenerate-word-index!)
   (make-parent-directory* wordidx-file)
-  (s-exp->fasl
-   (make-word-recs)
-   (open-output-file wordidx-file #:exists 'replace)))
+  (s-exp->fasl (make-word-recs) (open-output-file wordidx-file #:exists 'replace)))
 
 (define wordrecs
   (fasl->s-exp (open-input-file (and
