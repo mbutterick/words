@@ -1,12 +1,13 @@
 #lang debug racket/base
 (require racket/list
          "index.rkt")
+(provide make-words)
 
 (define (make-words #:letters [letters "etaoinshrdluw"]
                     #:mandatory [mandatory #f]
                     #:combo [combo #f]
-                    #:min [min-length 5]
-                    #:max [max-length 10]
+                    #:min [min-length-arg 5]
+                    #:max [max-length-arg 10]
                     #:hide-plurals [hide-plurals? #t]
                     #:proper-names [proper-names? #f]
                     #:max-words [max-words 10]
@@ -31,6 +32,8 @@
                   [all-caps? string-upcase]
                   [initial-caps? string-titlecase]
                   [else values]))
+  (define min-length (or min-length-arg 0))
+  (define max-length (or max-length-arg +inf.0))
   (for*/fold ([word-acc null]
               [count 0]
               #:result word-acc)

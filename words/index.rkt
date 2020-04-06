@@ -76,4 +76,5 @@
      (λ () (fasl->s-exp (current-input-port))))))
 
 (define (post-installer home-dir)
+  (displayln "running words post-installer")
   (regenerate-word-index!))
