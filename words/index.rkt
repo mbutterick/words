@@ -23,7 +23,7 @@
 (define (word->charidx word)
   (apply bitwise-ior
          (for/list ([c (in-string word)])
-           (expt 2 (char->bitindex c)))))
+                   (expt 2 (char->bitindex c)))))
 
 (define (bitindex->char i)
   (cond
@@ -34,14 +34,14 @@
 (define (charidx->chars int)
   (for/list ([i (in-range 64)]
              #:when (bitwise-bit-set? int i))
-    (bitindex->char i)))
+            (bitindex->char i)))
 
 (define (contains-char? charidx-entry c)
   (bitwise-bit-set? charidx-entry (char->bitindex c)))
 
 (define capitalized-mask
   (for/sum ([i (in-range 32 59)])
-    (expt 2 i)))
+           (expt 2 i)))
 
 (define (capitalized? charidx-entry)
   ;; a cap only appears at the beginning of a word,
@@ -53,20 +53,20 @@
 (require racket/set racket/match)
 (define (make-word-recs)
   (define words (for/set ([word (in-lines (open-input-file words-file))])
-                  word))
+                         word))
   (for/vector ([word (in-set words)])
-    (vector word
-            (word->charidx word)
-            (string-length word)
-            (match (regexp-match #rx"^(.+)e?s$" word)
-              [(list _ prefix) #:when (set-member? words prefix) #true]
-              [_ #false]))))
+              (vector word
+                      (word->charidx word)
+                      (string-length word)
+                      (match (regexp-match #rx"^(.+)e?s$" word)
+                        [(list _ prefix) #:when (set-member? words prefix) #true]
+                        [_ #false]))))
 
 (define (regenerate-word-index!)
   (make-parent-directory* wordidx-file)
-  (define op (open-output-file wordidx-file #:exists 'replace))
-  (s-exp->fasl (make-word-recs) op)
-  (flush-output op))
+  (with-output-to-file wordidx-file
+    (λ () (s-exp->fasl (make-word-recs) (current-output-port)))
+    #:exists 'replace))
 
 (define wordrecs
   (fasl->s-exp (open-input-file (and
