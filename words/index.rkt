@@ -69,10 +69,11 @@
     #:exists 'replace))
 
 (define wordrecs
-  (fasl->s-exp (open-input-file (and
-                                 (unless (file-exists? wordidx-file)
-                                   (regenerate-word-index!))
-                                 wordidx-file))))
+  (and
+   (unless (file-exists? wordidx-file)
+     (regenerate-word-index!))
+   (with-input-from-file wordidx-file
+     (λ () (fasl->s-exp (current-input-port))))))
 
 (define (post-installer home-dir)
   (regenerate-word-index!))
