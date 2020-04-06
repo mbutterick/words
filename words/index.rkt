@@ -71,3 +71,6 @@
                                  (unless (file-exists? wordidx-file)
                                    (regenerate-word-index!))
                                  wordidx-file))))
+
+(define (post-installer home-dir)
+  (regenerate-word-index!))
