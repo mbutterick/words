@@ -9,7 +9,6 @@
                     #:max [max-length 10]
                     #:hide-plurals [hide-plurals? #t]
                     #:proper-names [proper-names? #f]
-                    #:random [random #t]
                     #:max-words [max-words 10]
                     #:all-caps [all-caps? #f]
                     #:initial-caps [initial-caps? #f])
@@ -27,7 +26,7 @@
                mandatory-cs)
        char=?))))
   
-  (define capitalizer (cond
+  (define caer (cond
                         [all-caps? string-upcase]
                         [initial-caps? string-titlecase]
                         [else values]))
@@ -35,9 +34,8 @@
   (for*/fold ([word-acc null]
               [count 0]
               #:result word-acc)
-             ([idx (in-list ((if random shuffle values) (range (vector-length wordrecs))))]
+             ([idx (in-list (shuffle (range (vector-length wordrecs))))]
               [rec (in-value (vector-ref wordrecs idx))]
-              [word (in-value (word-rec-word rec))]
               [word-charidx (in-value (word-rec-charint rec))]
               #:break (= count (or max-words +inf.0))
               #:when (and
@@ -51,10 +49,13 @@
                       (for/and ([wc (in-list (map char-downcase (charidx->chars word-charidx)))])
                                (letter-cs-charidx . contains-char? . wc))
                       ;; maybe only proper names
-                      (if proper-names? (capitalized? word-charidx) (not (capitalized? word-charidx)))
+                      (if proper-names?
+                          (capitalized? word-charidx)
+                          (not (capitalized? word-charidx)))
                       ;; maybe hide plurals
-                      (or (not hide-plurals?) (not (word-rec-plural? rec)))))
-    (values (cons (capitalizer word) word-acc) (add1 count))))
+                      (or (not hide-plurals?)
+                          (not (word-rec-plural? rec)))))
+    (values (cons (caer (word-rec-word rec)) word-acc) (add1 count))))
 
 (module+ test
   (require rackunit)
