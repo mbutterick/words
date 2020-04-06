@@ -49,12 +49,9 @@
 
 
 (define (make-word-recs)
-  (define reverse-string (compose1 list->string reverse string->list))
-  (define omit-words (map reverse-string (file->lines "data/omit.rktd")))
   (for/vector ([w (in-lines (open-input-file "data/words.rktd"))]
                #:when (and (not (regexp-match "'" w)) ; no apostrophes
-                           (regexp-match #rx"^[A-Za-z]+$" w) ; no accented letters
-                           (not (member w omit-words)))) ; no bad words
+                           (regexp-match #rx"^[A-Za-z]+$" w)))
               (vector w
                       (word->charidx w)
                       (string-length w))))

@@ -53,7 +53,7 @@
                       ;; maybe only proper names
                       (if proper-names? (capitalized? word-charidx) (not (capitalized? word-charidx)))
                       ;; maybe hide plurals
-                      (if hide-plurals? (not (regexp-match #rx"s$" word)) #t)))
+                      (if hide-plurals? (not (regexp-match #rx"s$" word)) #true)))
     (values (cons (capitalizer word) word-acc) (add1 count))))
 
 (module+ test

@@ -38450,7 +38450,6 @@ cocircular
 cocircularity
 cocitizen
 cocitizenship
-cock
 cockade
 cockaded
 Cockaigne
@@ -48406,7 +48405,6 @@ Dammara
 damme
 dammer
 dammish
-damn
 damnability
 damnable
 damnableness
@@ -67891,7 +67889,6 @@ faeryland
 faff
 faffle
 faffy
-fag
 Fagaceae
 fagaceous
 fagald
@@ -67900,10 +67897,6 @@ Fagara
 fage
 Fagelia
 fager
-fagger
-faggery
-fagging
-faggingly
 fagine
 fagopyrism
 fagopyrismus
@@ -124411,17 +124404,6 @@ niggardliness
 niggardling
 niggardly
 niggardness
-nigger
-niggerdom
-niggerfish
-niggergoose
-niggerhead
-niggerish
-niggerism
-niggerling
-niggertoe
-niggerweed
-niggery
 niggle
 niggler
 niggling
@@ -160443,7 +160425,6 @@ puss
 pusscat
 pussley
 pusslike
-pussy
 pussycat
 pussyfoot
 pussyfooted
