@@ -7,7 +7,7 @@
                     #:mandatory [mandatory #f]
                     #:min [min-length 5]
                     #:max [max-length 10]
-                    #:hide-plurals [hide-plurals? #f]
+                    #:hide-plurals [hide-plurals? #t]
                     #:proper-names [proper-names? #f]
                     #:random [random #t]
                     #:max-words [max-words 10]
@@ -53,7 +53,7 @@
                       ;; maybe only proper names
                       (if proper-names? (capitalized? word-charidx) (not (capitalized? word-charidx)))
                       ;; maybe hide plurals
-                      (if hide-plurals? (not (regexp-match #rx"s$" word)) #true)))
+                      (or (not hide-plurals?) (not (word-rec-plural? rec)))))
     (values (cons (capitalizer word) word-acc) (add1 count))))
 
 (module+ test

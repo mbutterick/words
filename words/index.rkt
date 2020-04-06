@@ -9,6 +9,7 @@
 (define (word-rec-word val) (vector-ref val 0))
 (define (word-rec-charint val) (vector-ref val 1))
 (define (word-rec-length val) (vector-ref val 2))
+(define (word-rec-plural? val) (vector-ref val 3))
 
 
 (define (char->bitindex c)
@@ -47,11 +48,19 @@
   ;; so it's sufficient to test whether a cap exists in the idx
   (positive? (bitwise-and charidx-entry capitalized-mask)))
 
-(define-runtime-path words-data "data/words.rktd")
+(define-runtime-path words-file "data/words.rktd")
 
+(require racket/set racket/match)
 (define (make-word-recs)
-  (for/vector ([w (in-lines (open-input-file words-data))])
-    (vector w (word->charidx w) (string-length w))))
+  (define words (for/set ([word (in-lines (open-input-file words-file))])
+                  word))
+  (for/vector ([word (in-set words)])
+    (vector word
+            (word->charidx word)
+            (string-length word)
+            (match (regexp-match #rx"^(.+)e?s$" word)
+              [(list _ prefix) #:when (set-member? words prefix) #true]
+              [_ #false]))))
 
 (define (regenerate-word-index!)
   (make-parent-directory* wordidx-file)

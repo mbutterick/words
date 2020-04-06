@@ -173774,6 +173774,7 @@ Sassanidae
 Sassanide
 Sassenach
 sassolite
+sass
 sassy
 sassywood
 Sastean
