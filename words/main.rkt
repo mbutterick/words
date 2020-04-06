@@ -1,6 +1,5 @@
 #lang debug racket/base
 (require racket/list
-         racket/file
          "index.rkt")
 
 (define (make-words #:letters [letters "etaoinshrdluw"]
@@ -14,23 +13,21 @@
                     #:initial-caps [initial-caps? #f])
   (define mandatory-cs
     (if mandatory (remove-duplicates (for/list ([c (in-string mandatory)])
-                                               (char-downcase c)) char=?) null))
+                                       (char-downcase c)) char=?) null))
   (define letter-cs-charidx
     (word->charidx
      (list->string
       (remove-duplicates
        (append (if letters
                    (for/list ([c (in-string letters)])
-                             (char-downcase c))
+                     (char-downcase c))
                    null)
                mandatory-cs)
        char=?))))
-  
-  (define caer (cond
-                        [all-caps? string-upcase]
-                        [initial-caps? string-titlecase]
-                        [else values]))
-  
+  (define caser (cond
+                 [all-caps? string-upcase]
+                 [initial-caps? string-titlecase]
+                 [else values]))
   (for*/fold ([word-acc null]
               [count 0]
               #:result word-acc)
@@ -44,10 +41,10 @@
                       ;; word contains each mandatory char, case-insensitive
                       (or (not mandatory)
                           (for/and ([mc (in-list mandatory-cs)])
-                                   (word-charidx . contains-char? . mc)))
+                            (word-charidx . contains-char? . mc)))
                       ;; word contains only letters + mandatory, case-insensitive
                       (for/and ([wc (in-list (map char-downcase (charidx->chars word-charidx)))])
-                               (letter-cs-charidx . contains-char? . wc))
+                        (letter-cs-charidx . contains-char? . wc))
                       ;; maybe only proper names
                       (if proper-names?
                           (capitalized? word-charidx)
@@ -55,7 +52,7 @@
                       ;; maybe hide plurals
                       (or (not hide-plurals?)
                           (not (word-rec-plural? rec)))))
-    (values (cons (caer (word-rec-word rec)) word-acc) (add1 count))))
+    (values (cons (caser (word-rec-word rec)) word-acc) (add1 count))))
 
 (module+ test
   (require rackunit)
