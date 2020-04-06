@@ -64,7 +64,9 @@
 
 (define (regenerate-word-index!)
   (make-parent-directory* wordidx-file)
-  (s-exp->fasl (make-word-recs) (open-output-file wordidx-file #:exists 'replace)))
+  (define op (open-output-file wordidx-file #:exists 'replace))
+  (s-exp->fasl (make-word-recs) op)
+  (flush-output op))
 
 (define wordrecs
   (fasl->s-exp (open-input-file (and
