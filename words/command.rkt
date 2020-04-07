@@ -16,7 +16,7 @@
   (define combo #false)
   (define min-size #false)
   (define max-size #false)
-  (define max-words #false)
+  (define count #false)
   (define hide-plurals #true)
   (define proper-names #false)
   (command-line
@@ -32,9 +32,9 @@
    [("-c" "--combo") combo-arg
                      "mandatory combo"
                      (set! combo combo-arg)]
-   [("-n" "--number") max-words-arg
+   [("-n" "--number") count-arg
                       "max number of results"
-                      (set! max-words (string->number max-words-arg))]
+                      (set! count (string->number count-arg))]
    [("--min") min-size-arg
               "minimum word lengths"
               (set! min-size (string->number min-size-arg))]
@@ -50,7 +50,7 @@
   (displayln (string-join (make-words #:letters letters
                                       #:mandatory mandatory
                                       #:combo combo
-                                      #:max-words max-words
+                                      #:count count
                                       #:min min-size
                                       #:max max-size
                                       #:hide-plurals hide-plurals

@@ -3,16 +3,17 @@
          "index.rkt")
 (provide make-words)
 
-(define (make-words #:letters [letters "etaoinshrdluw"]
+(define (make-words #:letters [letters-arg #f]
                     #:mandatory [mandatory #f]
                     #:combo [combo #f]
                     #:min [min-length-arg 5]
                     #:max [max-length-arg 10]
                     #:hide-plurals [hide-plurals? #t]
                     #:proper-names [proper-names? #f]
-                    #:max-words [max-words 10]
+                    #:count [count 10]
                     #:all-caps [all-caps? #f]
                     #:initial-caps [initial-caps? #f])
+  (define letters (or letters-arg "abcdefghijklmnopqrstuvwxyz"))
   (define mandatory-cs
     (if (or mandatory combo)
         (remove-duplicates
@@ -35,13 +36,13 @@
   (define min-length (or min-length-arg 0))
   (define max-length (or max-length-arg +inf.0))
   (for*/fold ([word-acc null]
-              [count 0]
+              [count-acc 0]
               #:result word-acc)
              ([idx (in-list (shuffle (range (vector-length wordrecs))))]
               [rec (in-value (vector-ref wordrecs idx))]
               [word-charidx (in-value (word-rec-charint rec))]
               [word (in-value (word-rec-word rec))]
-              #:break (= count (or max-words +inf.0))
+              #:break (= count-acc (or count +inf.0))
               #:when (and
                       ;; between min and max length
                       ((if (<= min-length max-length) <= >=) min-length (word-rec-length rec) max-length)
@@ -60,10 +61,10 @@
                       ;; maybe hide plurals
                       (or (not hide-plurals?)
                           (not (word-rec-plural? rec)))))
-    (values (cons (caser word) word-acc) (add1 count))))
+    (values (cons (caser word) word-acc) (add1 count-acc))))
 
 (module+ test
   (require rackunit)
   (time (make-words))
-  (check-equal? (sort (make-words #:mandatory "xyz" #:combo #false) string<?)
+  (check-equal? (sort (make-words #:mandatory "xyz" #:combo #false #:letters "etaoinshrdluw") string<?)
                   '("azoxy" "dysoxidize" "isazoxy" "oxytonize" "rhizotaxy" "zootaxy")))
