@@ -54,6 +54,6 @@
                                       #:min min-size
                                       #:max max-size
                                       #:hide-plurals hide-plurals
-                                      #:proper-names proper-names) " ")))
+                                      #:proper-names proper-names) "\n")))
 
 
