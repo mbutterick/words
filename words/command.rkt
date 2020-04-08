@@ -16,7 +16,7 @@
   (define combo #false)
   (define min-size #false)
   (define max-size #false)
-  (define count #false)
+  (define count 20)
   (define hide-plurals #true)
   (define proper-names #false)
   (command-line
