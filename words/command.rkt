@@ -36,10 +36,10 @@
                       "max number of results"
                       (set! count (string->number count-arg))]
    [("--min") min-size-arg
-              "minimum word lengths"
+              "minimum word length"
               (set! min-size (string->number min-size-arg))]
    [("--max") max-size-arg
-              "minimum word lengths"
+              "maximum word length"
               (set! max-size (string->number max-size-arg))]
    [("-s" "--show-plurals") 
                       "show plural words"
