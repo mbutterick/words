@@ -5,6 +5,7 @@
 
 (define (make-words #:letters [letters-arg #f]
                     #:mandatory [mandatory #f]
+                    #:omit [omit #f]
                     #:combo [combo #f]
                     #:min [min-length-arg 5]
                     #:max [max-length-arg 10]
@@ -19,6 +20,10 @@
         (remove-duplicates
          (for/list ([c (in-string (string-append (or mandatory "") (or combo "")))])
                    (char-downcase c)) char=?) null))
+  (define forbidden-cs
+    (remove-duplicates
+     (for/list ([c (in-string (or omit ""))])
+      (char-downcase c)) char=?))
   (define letter-cs-charidx
     (word->charidx
      (list->string
@@ -54,6 +59,9 @@
                                (letter-cs-charidx . contains-char? . wc))
                       (or (not combo)
                           (regexp-match combo word))
+                      ;; word does not contain forbidden characters
+                      (for/and ([fc (in-list forbidden-cs)])
+                        (not (word-charidx . contains-char? . fc)))
                       ;; maybe only proper names
                       (if proper-names?
                           (capitalized? word-charidx)
