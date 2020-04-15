@@ -1,7 +1,6 @@
 #lang debug racket/gui
 (require words)
 
-
 (define the-fam
   (for*/first ([preferred
                 '("Triplicate T4" "Menlo" "Consolas" "Andale Mono" "Courier")]
@@ -17,7 +16,7 @@
                     [x 100]
                     [y 100]
                     [alignment '(left top)]
-                    [spacing 12]
+                    [spacing 3]
                     [border 6]))
 
 
@@ -77,7 +76,7 @@
 (for ([param (list current-min-size current-max-size)]
       [start-size (list (current-min-size) (- (current-max-size) 10))]
       [end-size (list (+ (current-min-size) 10) (current-max-size))]
-      [label-str '("min length" "max length")]
+      [label-str '("shortest " "longest  ")]
       [selected-item (list 0 10)])
      (new radio-box%
           [parent window]
@@ -112,7 +111,7 @@
 (define rb-casing
   (new radio-box%
        [parent window]
-       [label #f]
+       [label "casing "]
        [font mono-font]
        [horiz-margin 12]
        [style '(horizontal)]
@@ -148,7 +147,7 @@
 (let ([button-panel (new horizontal-panel% [parent window]
                          [alignment '(left top)]
                          [stretchable-height #false])])
-  (for ([count (in-list '(50 100 500 1000 all))])
+  (for ([count (in-list '(50 100 200 400 800 1600))])
        (define count-str (format "~a" count))
        (new button% [parent button-panel]
             [label count-str]
