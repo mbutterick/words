@@ -3,5 +3,5 @@
 (define post-install-collection "index.rkt")
 (define raco-commands '(("words" (submod words/command raco) "issue words command" #f)))
 
-#;(define racket-launcher-names '("Words.app"))
-#;(define racket-launcher-libraries '("app.rkt"))
+(define gracket-launcher-names '("Words.app"))
+(define gracket-launcher-libraries '("app.rkt"))

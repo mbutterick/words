@@ -58,7 +58,7 @@
                       (for/and ([wc (in-list (map char-downcase (charidx->chars word-charidx)))])
                                (letter-cs-charidx . contains-char? . wc))
                       (or (not combo)
-                          (regexp-match combo word))
+                          (regexp-match (string-downcase combo) word))
                       ;; word does not contain forbidden characters
                       (for/and ([fc (in-list forbidden-cs)])
                         (not (word-charidx . contains-char? . fc)))
