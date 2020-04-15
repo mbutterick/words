@@ -11,6 +11,11 @@
 (define current-omit (make-parameter #f))
 (define current-mandatory (make-parameter #f))
 (define current-combo (make-parameter #f))
+(define refresh-thread (thread void))
+(define (buffered-refresh)
+  (set! refresh-thread (let ()
+                         (kill-thread refresh-thread)
+                         (thread (λ () (sleep 0.2) (refresh-wordbox))))))
 (for ([param (list current-optional current-omit current-mandatory current-combo)]
       [str '("optional letters" "omitted letters" "mandatory letters" "mandatory combo")])
   (new text-field%	 	 
@@ -22,7 +27,9 @@
                    (param (match (send tf get-value)
                             [(? non-empty-string? str) str]
                             [_ #false]))
-                   (refresh-wordbox))]))
+                   ;; put delay on refresh so that rapid typing
+                   ;; doesn't trigger too many refreshes
+                   (buffered-refresh))]))
 
 (define current-min-size (make-parameter 3))
 (define current-max-size (make-parameter 20))
@@ -77,15 +84,15 @@
   (send ed insert
         (string-join
          (match (make-words #:count (current-word-count)
-                     #:letters (current-optional)
-                     #:omit (current-omit)
-                     #:mandatory (current-mandatory)
-                     #:combo (current-combo)
-                     #:case (current-case-choice)
-                     #:min (current-min-size)
-                     #:max (current-max-size)
-                     #:proper-names (current-proper-names-choice)
-                     #:hide-plurals (current-hide-plurals))
+                            #:letters (current-optional)
+                            #:omit (current-omit)
+                            #:mandatory (current-mandatory)
+                            #:combo (current-combo)
+                            #:case (current-case-choice)
+                            #:min (current-min-size)
+                            #:max (current-max-size)
+                            #:proper-names (current-proper-names-choice)
+                            #:hide-plurals (current-hide-plurals))
            [(list words ..1) words]
            [_ (list "[no matching words]")]) " ")))
 
