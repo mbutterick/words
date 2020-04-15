@@ -12,8 +12,7 @@
                     #:hide-plurals [hide-plurals? #t]
                     #:proper-names [proper-names? #f]
                     #:count [count 10]
-                    #:all-caps [all-caps? #f]
-                    #:initial-caps [initial-caps? #f])
+                    #:case [casing #f])
   (define letters (or letters-arg "abcdefghijklmnopqrstuvwxyz"))
   (define mandatory-cs
     (if (or mandatory combo)
@@ -34,9 +33,10 @@
                    null)
                mandatory-cs)
        char=?))))
-  (define caser (cond
-                  [all-caps? string-upcase]
-                  [initial-caps? string-titlecase]
+  (define caser (case casing
+                  [(up upcase upper uppercase) string-upcase]
+                  [(title titlecase) string-titlecase]
+                  [(down downcase lower lowercase) string-downcase]
                   [else values]))
   (define min-length (or min-length-arg 0))
   (define max-length (or max-length-arg +inf.0))

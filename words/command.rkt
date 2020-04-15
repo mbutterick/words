@@ -79,8 +79,10 @@
                             #:max max-size
                             #:hide-plurals hide-plurals
                             #:proper-names proper-names
-                            #:all-caps uppercase
-                            #:initial-caps title-case))
+                            #:case (cond
+                                     [uppercase 'upper]
+                                     [title-case 'title]
+                                     [else #false])))
   (define-values (sort-key sort-cmp)
     (match sort-style
       ["kernscore" (values kernscore <)]
