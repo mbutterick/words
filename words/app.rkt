@@ -1,22 +1,23 @@
 #lang debug racket/gui
 (require words)
 
-(define the-fam
+(define app-mono-fam
   (for*/first ([preferred
                 '("Triplicate T4" "Menlo" "Consolas" "Andale Mono" "Courier")]
                [mono-fam (in-list (get-face-list 'mono))]               
                #:when (equal? preferred mono-fam))
               preferred))
 
-(define mono-font (make-font #:face the-fam #:size 16))
+(define app-font-size 16)
+(define app-font (make-font #:face (send normal-control-font get-face) #:size app-font-size))
 
 (define window (new frame% [label "Words"]
                     [width 700]
-                    [height 800]
+                    [height 700]
                     [x 100]
                     [y 100]
                     [alignment '(left top)]
-                    [spacing 3]
+                    [spacing 6]
                     [border 6]))
 
 
@@ -42,9 +43,10 @@
   (new text-field%	 	 
        [parent (or parent-panel window)]
        [label str]
-       [font mono-font]
+       [font app-font]
        [horiz-margin (if parent-panel 0 12)]
        [init-value (or (param) "")]
+       [min-width 330]
        [stretchable-width #f]
        [callback (λ (tf evt) (update-text-field! tf param))]))
 
@@ -63,7 +65,7 @@
        (new button%
             [label label-str]
             [parent optional-letter-panel]
-            [font mono-font]
+            [font app-font]
             [callback (tf-optional-button-callback str)])))
 
 (for ([param (list  current-omit current-mandatory current-combo)]
@@ -81,7 +83,7 @@
      (new radio-box%
           [parent window]
           [label label-str]
-          [font mono-font]
+          [font app-font]
           [horiz-margin 12]
           [style '(horizontal)]
           [selection selected-item]
@@ -101,7 +103,7 @@
        (new check-box%
             [parent checkbox-panel]
             [label msg]
-            [font mono-font]
+            [font app-font]
             [horiz-margin 6]
             [callback (λ (cb evt)
                         (param (send cb get-value))
@@ -112,7 +114,7 @@
   (new radio-box%
        [parent window]
        [label "casing "]
-       [font mono-font]
+       [font app-font]
        [horiz-margin 12]
        [style '(horizontal)]
        [choices '("default" "Title Case" "lowercase" "UPPERCASE")]
@@ -151,7 +153,7 @@
        (define count-str (format "~a" count))
        (new button% [parent button-panel]
             [label count-str]
-            [font mono-font]
+            [font app-font]
             [callback (λ (button evt)
                         (current-word-count (string->number count-str))
                         (refresh-wordbox))])))
@@ -160,7 +162,11 @@
                      [label #f]
                      [style '(multiple)]
                      [parent window]
-                     [font mono-font]))
+                     [font (make-font #:face app-mono-fam #:size app-font-size)]))
+
+(let ([ed (send wordbox get-editor)])
+  (send ed set-line-spacing (* app-font-size 0.4))
+  (send ed set-padding 6 3 6 3))
 
 (define (words-to-clipboard item evt)
   (send the-clipboard set-clipboard-string (send wordbox get-value) (send evt get-time-stamp)))
@@ -168,7 +174,7 @@
 (define button-copy
   (new button% [parent window]
        [label "copy words"]
-       [font mono-font]
+       [font app-font]
        [stretchable-width #true]
        [callback words-to-clipboard]))
 
