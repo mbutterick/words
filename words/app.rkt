@@ -129,20 +129,22 @@
 (define (refresh-wordbox)
   (define ed (send wordbox get-editor))
   (send ed erase)
+  (define wordlist (make-words #:count (current-word-count)
+                               #:letters (current-optional)
+                               #:omit (current-omit)
+                               #:mandatory (current-mandatory)
+                               #:combo (current-combo)
+                               #:case (current-case-choice)
+                               #:min (current-min-size)
+                               #:max (current-max-size)
+                               #:proper-names (current-proper-names-choice)
+                               #:hide-plurals (current-hide-plurals)))
   (send ed insert
         (string-join
-         (match (make-words #:count (current-word-count)
-                            #:letters (current-optional)
-                            #:omit (current-omit)
-                            #:mandatory (current-mandatory)
-                            #:combo (current-combo)
-                            #:case (current-case-choice)
-                            #:min (current-min-size)
-                            #:max (current-max-size)
-                            #:proper-names (current-proper-names-choice)
-                            #:hide-plurals (current-hide-plurals))
+         (match wordlist
            [(list words ..1) words]
-           [_ (list "[no matching words]")]) " ")))
+           [_ (list "[no matching words]")]) " "))
+  (update-copy-button-label (length wordlist)))
 
 (define current-word-count (make-parameter 50))
 
@@ -198,14 +200,21 @@
 (define menu-item-refresh
   (make-menu-item "Regenerate" #\R (λ (thing evt) (refresh-wordbox))))
 
+(define (update-copy-button-label count)
+  (send button-copy set-label (format "copy ~a words" count)))
+
+(define (change-word-count amt)
+  (define new-count (max (+ (current-word-count) amt) 0))
+  (current-word-count new-count))
+
 (define menu-item-more-words
   (make-menu-item "More" #\= (λ (thing evt)
-                               (current-word-count (+ (current-word-count) 25))
+                               (change-word-count 25)
                                (refresh-wordbox))))
 
 (define menu-item-fewer-words
   (make-menu-item "Fewer" #\- (λ (thing evt)
-                                (current-word-count (max (- (current-word-count) 25) 0))
+                                (change-word-count -25)
                                 (refresh-wordbox))))
 
 (refresh-wordbox)
