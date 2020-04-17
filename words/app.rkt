@@ -201,7 +201,7 @@
   (make-menu-item "Regenerate" #\R (λ (thing evt) (refresh-wordbox))))
 
 (define (update-copy-button-label count)
-  (send button-copy set-label (format "copy ~a words" count)))
+  (send button-copy set-label (format "copy ~a word~a" count (if (= 1 count) "" "s"))))
 
 (define (change-word-count amt)
   (define new-count (max (+ (current-word-count) amt) 0))
