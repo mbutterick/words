@@ -6,7 +6,7 @@
                 '("Triplicate T4" "Menlo" "Consolas" "Andale Mono" "Courier")]
                [mono-fam (in-list (get-face-list 'mono))]               
                #:when (equal? preferred mono-fam))
-              preferred))
+    preferred))
 
 (define app-font-size 16)
 (define app-font (make-font #:face (send normal-control-font get-face) #:size app-font-size))
@@ -62,35 +62,39 @@
     (update-text-field! tf-optional current-optional))
   (for ([label-str '("clear" "a-z" "etaoinshrdluw")]
         [str '("" "abcdefghijklmnopqrstuvwxyz" "etaoinshrdluw")])
-       (new button%
-            [label label-str]
-            [parent optional-letter-panel]
-            [font app-font]
-            [callback (tf-optional-button-callback str)])))
+    (new button%
+         [label label-str]
+         [parent optional-letter-panel]
+         [font app-font]
+         [callback (tf-optional-button-callback str)])))
 
 (for ([param (list  current-omit current-mandatory current-combo)]
       [str '("omitted letters" "mandatory letters" "mandatory combo")])
-     (make-text-field param str))
+  (make-text-field param str))
 
 (define current-min-size (make-parameter 3))
-(define current-max-size (make-parameter 20))
+(define current-max-size (make-parameter 24))
+
+(define length-panel (new horizontal-panel%
+                          [parent window]
+                          [horiz-margin 6]
+                          [alignment '(left top)]
+                          [stretchable-width #true]
+                          [stretchable-height #false]))
 
 (for ([param (list current-min-size current-max-size)]
-      [start-size (list (current-min-size) (- (current-max-size) 10))]
-      [end-size (list (+ (current-min-size) 10) (current-max-size))]
-      [label-str '("shortest " "longest  ")]
-      [selected-item (list 0 10)])
-     (new radio-box%
-          [parent window]
-          [label label-str]
-          [font app-font]
-          [horiz-margin 12]
-          [style '(horizontal)]
-          [selection selected-item]
-          [choices (map number->string (range start-size (add1 end-size)))]
-          [callback (λ (rb evt)
-                      (param (string->number (send rb get-item-label (send rb get-selection))))
-                      (refresh-wordbox))]))
+      [label-str '("word length from" "to")])
+  (new slider%
+       [parent length-panel]
+       [label label-str]
+       [font app-font]
+       [min-value (current-min-size)]
+       [max-value (current-max-size)]
+       [init-value (param)]
+       [stretchable-width #t]
+       [callback (λ (cb evt)
+                   (param (send cb get-value))
+                   (refresh-wordbox))]))
 
 (define current-proper-names-choice (make-parameter #f))
 (define current-hide-plurals (make-parameter #f))
@@ -100,14 +104,14 @@
                            [stretchable-height #false])])
   (for ([param (list current-proper-names-choice current-hide-plurals)]
         [msg '("show proper names" "hide plurals")])
-       (new check-box%
-            [parent checkbox-panel]
-            [label msg]
-            [font app-font]
-            [horiz-margin 6]
-            [callback (λ (cb evt)
-                        (param (send cb get-value))
-                        (refresh-wordbox))])))
+    (new check-box%
+         [parent checkbox-panel]
+         [label msg]
+         [font app-font]
+         [horiz-margin 6]
+         [callback (λ (cb evt)
+                     (param (send cb get-value))
+                     (refresh-wordbox))])))
 
 (define current-case-choice (make-parameter #f))
 (define rb-casing
@@ -152,13 +156,13 @@
                          [alignment '(left top)]
                          [stretchable-height #false])])
   (for ([count (in-list '(50 100 200 400 800 1600))])
-       (define count-str (format "~a" count))
-       (new button% [parent button-panel]
-            [label count-str]
-            [font app-font]
-            [callback (λ (button evt)
-                        (current-word-count (string->number count-str))
-                        (refresh-wordbox))])))
+    (define count-str (format "~a" count))
+    (new button% [parent button-panel]
+         [label count-str]
+         [font app-font]
+         [callback (λ (button evt)
+                     (current-word-count (string->number count-str))
+                     (refresh-wordbox))])))
 
 (define wordbox (new text-field%
                      [label #f]
