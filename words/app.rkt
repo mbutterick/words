@@ -14,8 +14,8 @@
 (define window (new frame% [label "Words"]
                     [width 700]
                     [height 700]
-                    [x 100]
-                    [y 100]
+                    [x 40]
+                    [y 40]
                     [alignment '(left top)]
                     [spacing 6]
                     [border 6]))
