@@ -94,7 +94,7 @@
        [stretchable-width #t]
        [callback (λ (cb evt)
                    (param (send cb get-value))
-                   (refresh-wordbox))]))
+                   (buffered-refresh))]))
 
 (define current-proper-names-choice (make-parameter #f))
 (define current-hide-plurals (make-parameter #f))
