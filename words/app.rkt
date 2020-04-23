@@ -6,7 +6,7 @@
                 '("Triplicate T4" "Menlo" "Consolas" "Andale Mono" "Courier")]
                [mono-fam (in-list (get-face-list 'mono))]               
                #:when (equal? preferred mono-fam))
-    preferred))
+              preferred))
 
 (define app-font-size 16)
 (define app-font (make-font #:face (send normal-control-font get-face) #:size app-font-size))
@@ -50,27 +50,30 @@
        [stretchable-width #f]
        [callback (λ (tf evt) (update-text-field! tf param))]))
 
-(let ([optional-letter-panel (new horizontal-panel%
-                                  [parent window]
-                                  [horiz-margin 6]
-                                  [alignment '(left top)]
-                                  [stretchable-height #false])])
-  (define tf-optional
-    (make-text-field current-optional "optional letters" optional-letter-panel))
-  (define ((tf-optional-button-callback str) button evt)
-    (send tf-optional set-value str)
-    (update-text-field! tf-optional current-optional))
-  (for ([label-str '("clear" "a-z" "etaoinshrdluw")]
-        [str '("" "abcdefghijklmnopqrstuvwxyz" "etaoinshrdluw")])
-    (new button%
-         [label label-str]
-         [parent optional-letter-panel]
-         [font app-font]
-         [callback (tf-optional-button-callback str)])))
+(define optional-letter-panel (new horizontal-panel%
+                                   [parent window]
+                                   [horiz-margin 6]
+                                   [alignment '(left top)]
+                                   [stretchable-height #false]))
+(define tf-optional
+  (make-text-field current-optional "optional letters" optional-letter-panel))
+
+(define ((tf-optional-button-callback str) button evt)
+  (send tf-optional set-value str)
+  (update-text-field! tf-optional current-optional))
+
+(match-define (list button-clear button-az button-common)
+(for/list ([label-str '("clear" "a-z" "etaoinshrdluw")]
+      [str '("" "abcdefghijklmnopqrstuvwxyz" "etaoinshrdluw")])
+     (new button%
+          [label label-str]
+          [parent optional-letter-panel]
+          [font app-font]
+          [callback (tf-optional-button-callback str)])))
 
 (for ([param (list  current-omit current-mandatory current-combo)]
       [str '("omitted letters" "mandatory letters" "mandatory combo")])
-  (make-text-field param str))
+     (make-text-field param str))
 
 (define current-min-size (make-parameter 3))
 (define current-max-size (make-parameter 24))
@@ -84,17 +87,17 @@
 
 (for ([param (list current-min-size current-max-size)]
       [label-str '("word length from" "to")])
-  (new slider%
-       [parent length-panel]
-       [label label-str]
-       [font app-font]
-       [min-value (current-min-size)]
-       [max-value (current-max-size)]
-       [init-value (param)]
-       [stretchable-width #t]
-       [callback (λ (cb evt)
-                   (param (send cb get-value))
-                   (buffered-refresh))]))
+     (new slider%
+          [parent length-panel]
+          [label label-str]
+          [font app-font]
+          [min-value (current-min-size)]
+          [max-value (current-max-size)]
+          [init-value (param)]
+          [stretchable-width #t]
+          [callback (λ (cb evt)
+                      (param (send cb get-value))
+                      (buffered-refresh))]))
 
 (define current-proper-names-choice (make-parameter #f))
 (define current-hide-plurals (make-parameter #f))
@@ -104,14 +107,14 @@
                            [stretchable-height #false])])
   (for ([param (list current-proper-names-choice current-hide-plurals)]
         [msg '("show proper names" "hide plurals")])
-    (new check-box%
-         [parent checkbox-panel]
-         [label msg]
-         [font app-font]
-         [horiz-margin 6]
-         [callback (λ (cb evt)
-                     (param (send cb get-value))
-                     (refresh-wordbox))])))
+       (new check-box%
+            [parent checkbox-panel]
+            [label msg]
+            [font app-font]
+            [horiz-margin 6]
+            [callback (λ (cb evt)
+                        (param (send cb get-value))
+                        (refresh-wordbox))])))
 
 (define current-case-choice (make-parameter #f))
 (define rb-casing
@@ -156,13 +159,13 @@
                          [alignment '(left top)]
                          [stretchable-height #false])])
   (for ([count (in-list '(50 100 200 400 800 1600))])
-    (define count-str (format "~a" count))
-    (new button% [parent button-panel]
-         [label count-str]
-         [font app-font]
-         [callback (λ (button evt)
-                     (current-word-count (string->number count-str))
-                     (refresh-wordbox))])))
+       (define count-str (format "~a" count))
+       (new button% [parent button-panel]
+            [label count-str]
+            [font app-font]
+            [callback (λ (button evt)
+                        (current-word-count (string->number count-str))
+                        (refresh-wordbox))])))
 
 (define wordbox (new text-field%
                      [label #f]
@@ -212,14 +215,22 @@
   (current-word-count new-count))
 
 (define menu-item-more-words
-  (make-menu-item "More" #\= (λ (thing evt)
+  (make-menu-item "More words" #\= (λ (thing evt)
                                (change-word-count 25)
                                (refresh-wordbox))))
 
 (define menu-item-fewer-words
-  (make-menu-item "Fewer" #\- (λ (thing evt)
+  (make-menu-item "Fewer words" #\- (λ (thing evt)
                                 (change-word-count -25)
                                 (refresh-wordbox))))
+
+; (list button-clear button-az button-common)
+(define menu-item-clear
+  (make-menu-item "Clear letters" #\1 (λ (thing evt) (send button-clear command evt))))
+(define menu-item-az
+  (make-menu-item "Use a-z" #\2 (λ (thing evt) (send button-az command evt))))
+(define menu-item-common
+  (make-menu-item "Use etaoin" #\3 (λ (thing evt) (send button-common command evt))))
 
 (refresh-wordbox)
 (send window show #t)
